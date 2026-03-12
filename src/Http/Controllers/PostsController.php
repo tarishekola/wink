@@ -112,20 +112,32 @@ class PostsController
      */
     private function collectTags($incomingTags)
     {
-        $allTags = WinkTag::all();
+        if (!$incomingTags) {
+            return [];
+        }
 
-        return collect($incomingTags)->map(function ($incomingTag) use ($allTags) {
-            $tag = $allTags->where('id', $incomingTag['id'])->first();
+        return collect($incomingTags)->map(function ($incomingTag) {
 
-            if (! $tag) {
-                $tag = WinkTag::create([
-                    'id' => $id = Str::uuid(),
-                    'name' => $incomingTag['name'],
-                    'slug' => Str::slug($incomingTag['name']),
-                ]);
+            if (isset($incomingTag['id']) && $incomingTag['id']) {
+                $tag = WinkTag::find($incomingTag['id']);
+
+                if ($tag) {
+                    return (string) $tag->id;
+                }
             }
 
+            $slug = Str::slug($incomingTag['name']);
+
+            $tag = WinkTag::firstOrCreate(
+                ['slug' => $slug],
+                [
+                    'id' => Str::uuid(),
+                    'name' => $incomingTag['name'],
+                ]
+            );
+
             return (string) $tag->id;
+
         })->toArray();
     }
 
