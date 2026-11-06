@@ -110,6 +110,11 @@ class WinkAuthor extends AbstractWinkModel implements Authenticatable
         return $this->{$this->getAuthIdentifierName()};
     }
 
+    public function getAuthPasswordName()
+    {
+        return 'password';
+    }
+
     /**
      * Get the password for the user.
      *
